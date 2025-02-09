@@ -238,7 +238,7 @@ class DepthPro(nn.Module):
         if hasattr(self, "fov"):
             fov_deg = self.fov.forward(x, features_0.detach())
 
-        return canonical_inverse_depth, fov_deg
+        return canonical_inverse_depth, fov_deg #disparity, fov_deg
 
     @torch.no_grad()
     def infer(
@@ -279,6 +279,7 @@ class DepthPro(nn.Module):
             )
 
         canonical_inverse_depth, fov_deg = self.forward(x)
+
         if f_px is None:
             f_px = 0.5 * W / torch.tan(0.5 * torch.deg2rad(fov_deg.to(torch.float)))
         
@@ -291,6 +292,8 @@ class DepthPro(nn.Module):
             )
 
         depth = 1.0 / torch.clamp(inverse_depth, min=1e-4, max=1e4)
+        print("fps", f_px)  
+        print("depth", depth.shape)
 
         return {
             "depth": depth.squeeze(),
