@@ -30,11 +30,11 @@ class Cityscapes(Dataset):
             A.GaussNoise(p=0.5),
             A.Blur(p=0.5),
             A.HueSaturationValue(p=0.5),
-            A.Resize(518, 1036),
+            A.Resize(1536, 1536),
         ])
 
         self.transform_val = A.Compose([
-            A.Resize(518, 1036),
+            A.Resize(1536, 1536),
         ])
         
         
@@ -70,9 +70,9 @@ class Cityscapes(Dataset):
         # disparity = (disparity - 1.0) / 256.0 # ifp=0 -> p-1/
         
         disparity[disparity>0] = (disparity[disparity>0] - 1.0) / 256.0
+
         b= 0.209313 #baseline in meters
         fx= 2262.52 #focal length in pixels
-
         depth = (fx * b) / (disparity + 1e-6) #depth = (fx * b) / disparity
 
         # print("max-min depth values", np.max(depth), np.min(depth))
