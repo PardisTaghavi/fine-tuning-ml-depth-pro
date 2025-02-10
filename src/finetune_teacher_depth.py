@@ -50,6 +50,7 @@ def train(model, train_loader, criterion, optimizer, scheduler, device, epoch, a
         images = nn.functional.interpolate(images, size=(1536, 1536), mode='bilinear', align_corners=False)
         '''
         images, _, gt_depth= batch #labels and depths are not used
+        # img , pseudo files[depth meter] , gt dispatiry to depth[depth meter]
         images = images.to(device)
         gt_depth = gt_depth.to(device)
 
@@ -77,7 +78,7 @@ def train(model, train_loader, criterion, optimizer, scheduler, device, epoch, a
             loss_grad = grad_loss(pred, depth_normalized)
             loss = 3.0 * loss_midas + 2.0 * loss_grad
         
-        print("------------?loss", loss)
+        # print("------------?loss", loss)
         scaler.scale(loss).backward()
         torch.nn.utils.clip_grad_norm_(model.parameters(), 0.2)
         scaler.step(optimizer)
