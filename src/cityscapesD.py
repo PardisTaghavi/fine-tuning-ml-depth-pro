@@ -67,7 +67,7 @@ class Cityscapes(Dataset):
         #disparity could be dispatiy of GT of cityscapes or pseudo depth of the teacher
         # print(disparity.shape, disparity.max(), disparity.min()) [0-31209]
         # print(label.shape, label.max(), label.min()) [0-255]
-        if disparity.max() > 255: #cityscapes disparity
+        if disparity.max() > 300: #cityscapes disparity
 
             disparity[disparity>0] = (disparity[disparity>0] - 1.0) / 256.0
 
