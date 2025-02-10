@@ -31,6 +31,12 @@ fine-tuning
 ```
 torchrun --nproc_per_node=2 finetune_teacher_depth.py --batch_size 16 --epochs 10 --data_dir /home/avalocal/thesis23/KD/ml-depth-pro/train_few_shot_16 --lr 1e-5
 ```
+Cityscapes
+| lr   | d1 | d2 | d3 | abs_rel | sq_rel | rmse | rmse_log | log10 | silog |
+|------|----|----|----|----------|--------|-----|----------|-------|-------|
+| 0shot |0.743 |0.917|0.963|0.206|0.039|0.116|0.415|0.087|0.413
+
+
 
 
 
