@@ -64,36 +64,20 @@ class Cityscapes(Dataset):
         label =cv2.imread(self.pseudo_files[idx], cv2.IMREAD_UNCHANGED) #0-80 
         disparity = cv2.imread(self.depth_files[idx], cv2.IMREAD_UNCHANGED)
 
-        #disparity precomputed disparity depth maps. To obtain the disparity values, 
-        # compute for each pixel p with p > 0: d = ( float(p) - 1. ) / 256.,
-        #  while a value p = 0 is an invalid measurement.
-        # disparity = (disparity - 1.0) / 256.0 # ifp=0 -> p-1/
-        
-        disparity[disparity>0] = (disparity[disparity>0] - 1.0) / 256.0
+        #disparity could be dispatiy of GT of cityscapes or pseudo depth of the teacher
+        # print(disparity.shape, disparity.max(), disparity.min()) [0-31209]
+        # print(label.shape, label.max(), label.min()) [0-255]
+        if disparity.max() > 255: #cityscapes disparity
 
-        b= 0.209313 #baseline in meters
-        fx= 2262.52 #focal length in pixels
-        depth = (fx * b) / (disparity + 1e-6) #depth = (fx * b) / disparity
+            disparity[disparity>0] = (disparity[disparity>0] - 1.0) / 256.0
 
-        # print("max-min depth values", np.max(depth), np.min(depth))
-        # print("unique values", np.sort(np.unique(depth)))
-        #invalid measurements to zero
-        depth[depth> 1e6] = 0
-        depth = np.clip(depth, 0, 80) #clip to 80m
-
-        #show depth 
-        # import matplotlib.pyplot as plt
-        # import matplotlib
-        # matplotlib.use('TkAgg')
-        # plt.imshow(depth)
-        # plt.show()
-
-        # breakpoint()
-
-        # we might need to clip to [0-80m later] #TODO
-
-
-
+            b= 0.209313 #baseline in meters
+            fx= 2262.52 #focal length in pixels
+            depth = (fx * b) / (disparity + 1e-6) 
+            depth[depth> 1e6] = 0
+            depth = np.clip(depth, 0, 80) #clip to 80m
+        else: #pseudo depth of teacher
+            depth = disparity / disparity.max() * 80.0 #normalize to 0-80m
 
 
         if self.split != 'val':
@@ -127,10 +111,23 @@ class Cityscapes(Dataset):
 if __name__ == "__main__":
 
     transform = None
-    dataset = Cityscapes(root_dir='/media/avalocal/T7/pardis/pardis/perception_system/datasets/cityscapes', split='train_unlabeled', task='instance')
+    dataset = Cityscapes(root_dir='/home/avalocal/thesis23/KD/ml-depth-pro/train_merge_1860_186', split='train')
     print(len(dataset))
-    dataloader = torch.utils.data.DataLoader(dataset, batch_size=4, shuffle=True, num_workers=0)
-    batch = next(iter(dataloader))
-    # print(len(batch))
-    # print(batch[0].shape, batch[1].shape, batch[2].shape, batch[3].shape, batch[4], batch[5])
+
+    for i in range(len(dataset)):
+        image, label, depth = dataset[i]
+        print(image.shape, label.shape, depth.shape)
+        breakpoint()
+        # print(image.shape, label.shape, depth.shape)
+        # print(np.unique(label))
+        # print(np.unique(depth))
+        # print(np.max(depth), np.min(depth))
+        # plt.imshow(image)
+        # plt.show()
+        # plt.imshow(label)
+        # plt.show()
+        # plt.imshow(depth)
+        # plt.show()
+        # break
+
 
